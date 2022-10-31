@@ -3,7 +3,12 @@
         <div class="row text-center">
             <div class="col-12 col-lg-4">
                 <div class="card mb-3">
-                    <div class="card-header">Buffer</div>
+                    <div class="card-header">
+                        Buffer
+                        <b class="text-danger">
+                            {{ getCardList(1).length }}
+                        </b>
+                    </div>
                     <div
                         class="card-body drop-zone"
                         @drop="onDrop($event, 1)"
@@ -24,7 +29,12 @@
             </div>
             <div class="col-12 col-lg-4">
                 <div class="card mb-3">
-                    <div class="card-header">Working</div>
+                    <div class="card-header">
+                        Working
+                        <b class="text-warning">
+                            {{ getCardList(2).length }}
+                        </b>
+                    </div>
                     <div
                         class="card-body drop-zone"
                         @drop="onDrop($event, 2)"
@@ -45,7 +55,10 @@
             </div>
             <div class="col-12 col-lg-4">
                 <div class="card">
-                    <div class="card-header">Done</div>
+                    <div class="card-header">
+                        Done
+                        <b class="text-success">{{ getCardList(3).length }}</b>
+                    </div>
                     <div
                         class="card-body drop-zone"
                         @drop="onDrop($event, 3)"
@@ -69,44 +82,23 @@
 </template>
 
 <script>
+import axios from "axios";
 import { ref } from "vue";
+
 export default {
-    mounted() {
-        console.log("Component mounted.");
-    },
     setup() {
-        const items = ref([
-            {
-                id: 1,
-                name: "Agregar subtareas al kanban",
-                deadline: "2022-10-30",
-                status: 1,
-            },
-            {
-                id: 2,
-                name: "Testing kanban",
-                deadline: "2022-10-30",
-                status: 2,
-            },
-            {
-                id: 3,
-                name: "Agregar Vuex",
-                deadline: "2022-10-30",
-                status: 1,
-            },
-            {
-                id: 4,
-                name: "Convertir app a SPA",
-                deadline: "2022-10-30",
-                status: 1,
-            },
-        ]);
+        const items = ref([]);
+        const loadData = async () => {
+            const response = await axios.get("cards");
+            items.value = response.data;
+        };
+
+        loadData();
         const getCardList = (status) => {
             return items.value.filter((item) => item.status == status);
         };
 
         const startDrag = (event, item) => {
-            console.log(item);
             event.dataTransfer.dropEffect = "move";
             event.dataTransfer.effectAllowed = "move";
             event.dataTransfer.setData("itemID", item.id);
