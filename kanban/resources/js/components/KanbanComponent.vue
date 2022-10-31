@@ -137,7 +137,7 @@
                         ></button>
                     </div>
                     <div class="modal-body">
-                        <form @submit.prevent="saveCard(item, action)">
+                        <form @submit.prevent="saveCard(item, item.action)">
                             <label for="name">Nombre de la tarea</label>
                             <input
                                 type="text"
@@ -216,6 +216,7 @@ export default {
                 item.name = value.name;
                 item.deadline = value.deadline;
                 item.status = value.status;
+                item.action = action;
             } else {
                 item.name = "";
                 item.deadline = "";
