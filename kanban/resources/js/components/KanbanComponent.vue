@@ -84,6 +84,7 @@
 <script>
 import axios from "axios";
 import { ref } from "vue";
+import Swal from "sweetalert2";
 
 export default {
     setup() {
@@ -107,9 +108,10 @@ export default {
             const itemID = event.dataTransfer.getData("itemID");
             const item = items.value.find((item) => item.id == itemID);
             item.status = status;
-            axios.put(`cards/${item.id}`, item).then((response) => {
-                console.log(response);
-            });
+            if (status == 3) {
+                Swal.fire("¡Felicitaciones por lograrlo!", "", "success");
+            }
+            axios.put(`cards/${item.id}`, item).then((response) => {});
         };
 
         return { getCardList, startDrag, onDrop };
