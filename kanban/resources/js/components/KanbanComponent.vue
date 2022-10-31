@@ -13,6 +13,7 @@
                             type="button"
                             data-bs-toggle="modal"
                             data-bs-target="#formModal"
+                            @click="getForm(item, 1)"
                         >
                             +
                         </button>
@@ -31,6 +32,7 @@
                             @dragstart="startDrag($event, item)"
                             data-bs-toggle="modal"
                             data-bs-target="#formModal"
+                            @click="getForm(item, 2)"
                         >
                             {{ item.name }}
                         </div>
@@ -59,6 +61,7 @@
                             @dragstart="startDrag($event, item)"
                             data-bs-toggle="modal"
                             data-bs-target="#formModal"
+                            @click="getForm(item, 2)"
                         >
                             {{ item.name }}
                         </div>
@@ -85,6 +88,7 @@
                             @dragstart="startDrag($event, item)"
                             data-bs-toggle="modal"
                             data-bs-target="#formModal"
+                            @click="getForm(item, 2)"
                         >
                             {{ item.name }}
                         </div>
@@ -115,7 +119,7 @@
                         ></button>
                     </div>
                     <div class="modal-body">
-                        <form @submit.prevent="saveCard(item)">
+                        <form @submit.prevent="saveCard(item, action)">
                             <label for="name">Nombre de la tarea</label>
                             <input
                                 type="text"
@@ -157,17 +161,19 @@
 
 <script>
 import axios from "axios";
-import { ref } from "vue";
+import { ref, reactive } from "vue";
 import Swal from "sweetalert2";
 
 export default {
     props: ["auth_user"],
     setup(props) {
-        const item = ref({
+        const item = reactive({
+            id: null,
             name: "",
             status: 1,
             deadline: "",
             user_id: props.auth_user.id,
+            action: 1,
         });
         const errors = ref([]);
         const items = ref([]);
@@ -185,6 +191,17 @@ export default {
         const showModal = () => {
             is_show.value = true;
         };
+        const getForm = (value, action) => {
+            if (action == 2) {
+                item.id = value.id;
+                item.name = value.name;
+                item.deadline = value.deadline;
+                item.status = value.status;
+            } else {
+                item.name = "";
+                item.deadline = "";
+            }
+        };
 
         const startDrag = (event, item) => {
             event.dataTransfer.dropEffect = "move";
@@ -200,19 +217,30 @@ export default {
             }
             axios.put(`cards/${item.id}`, item);
         };
-        const saveCard = (item) => {
-            axios
-                .post("cards", item)
-                .then(() => {
+        const saveCard = (item, action) => {
+            if (action == 1) {
+                axios
+                    .post("cards", item)
+                    .then(() => {
+                        item.name = "";
+                        item.deadline = "";
+                        is_show.value = false;
+                        errors.value = [];
+                        loadData();
+                    })
+                    .catch((error) => {
+                        errors.value = error.response.data.errors;
+                    });
+            } else {
+                axios.put(`cards/${item.id}`, item).then((response) => {
+                    item.status = 1;
                     item.name = "";
                     item.deadline = "";
                     is_show.value = false;
                     errors.value = [];
                     loadData();
-                })
-                .catch((error) => {
-                    errors.value = error.response.data.errors;
                 });
+            }
         };
         return {
             getCardList,
@@ -222,6 +250,7 @@ export default {
             saveCard,
             is_show,
             item,
+            getForm,
             errors,
         };
     },
