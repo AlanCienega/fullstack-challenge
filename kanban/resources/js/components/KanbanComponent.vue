@@ -218,6 +218,7 @@ export default {
                 item.status = value.status;
                 item.action = action;
             } else {
+                item.action = action;
                 item.name = "";
                 item.deadline = "";
             }
@@ -246,6 +247,7 @@ export default {
                         item.deadline = "";
                         is_show.value = false;
                         errors.value = [];
+                        Swal.fire("Guardado correctamente", "", "success");
                         loadData();
                     })
                     .catch((error) => {
@@ -258,6 +260,7 @@ export default {
                     item.deadline = "";
                     is_show.value = false;
                     errors.value = [];
+                    Swal.fire("Actualizado corectamente", "", "success");
                     loadData();
                 });
             }
