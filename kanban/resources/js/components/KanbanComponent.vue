@@ -107,6 +107,9 @@ export default {
             const itemID = event.dataTransfer.getData("itemID");
             const item = items.value.find((item) => item.id == itemID);
             item.status = status;
+            axios.put(`cards/${item.id}`, item).then((response) => {
+                console.log(response);
+            });
         };
 
         return { getCardList, startDrag, onDrop };

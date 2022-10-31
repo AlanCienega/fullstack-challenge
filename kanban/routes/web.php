@@ -21,4 +21,4 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::resource('/cards', CardController::class);
+Route::resource('/cards', CardController::class)->except(['create', 'show', 'edit']);
