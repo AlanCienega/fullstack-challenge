@@ -19,7 +19,7 @@ class CardFactory extends Factory
         return [
             'name' => $this->faker->sentence(5),
             'status' => $this->faker->numberBetween(1, 3),
-            'deadline' => $this->faker->date(),
+            'deadline' => $this->faker->dateTimeBetween('-1 week', '+1 week'),
             'user_id' => 1,
         ];
     }

@@ -25,7 +25,13 @@
                         @dragover.prevent
                     >
                         <div
-                            class="d-grid gap-2 btn btn-primary drag-el mb-2"
+                            :class="
+                                'd-grid gap-2 btn drag-el mb-2 btn-' +
+                                (new Date(item.deadline).getTime() <
+                                todayDate.getTime()
+                                    ? 'danger'
+                                    : 'primary')
+                            "
                             v-for="(item, index) in getCardList(1)"
                             :key="index"
                             draggable="true"
@@ -54,7 +60,13 @@
                         @dragover.prevent
                     >
                         <div
-                            class="d-grid gap-2 btn btn-primary drag-el mb-2"
+                            :class="
+                                'd-grid gap-2 btn drag-el mb-2 btn-' +
+                                (new Date(item.deadline).getTime() <
+                                todayDate.getTime()
+                                    ? 'danger'
+                                    : 'primary')
+                            "
                             v-for="(item, index) in getCardList(2)"
                             :key="index"
                             draggable="true"
@@ -81,9 +93,15 @@
                         @dragover.prevent
                     >
                         <div
+                            :class="
+                                'd-grid gap-2 btn drag-el mb-2 btn-' +
+                                (new Date(item.deadline).getTime() <
+                                todayDate.getTime()
+                                    ? 'danger'
+                                    : 'primary')
+                            "
                             v-for="(item, index) in getCardList(3)"
                             :key="index"
-                            class="d-grid gap-2 btn btn-primary drag-el mb-2"
                             draggable="true"
                             @dragstart="startDrag($event, item)"
                             data-bs-toggle="modal"
@@ -175,6 +193,7 @@ export default {
             user_id: props.auth_user.id,
             action: 1,
         });
+        const todayDate = reactive(new Date());
         const errors = ref([]);
         const items = ref([]);
         const is_show = ref(false);
@@ -252,6 +271,7 @@ export default {
             item,
             getForm,
             errors,
+            todayDate,
         };
     },
 };
