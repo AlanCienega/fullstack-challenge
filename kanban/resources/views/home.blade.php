@@ -4,7 +4,7 @@
 <div class="container">
     <div class="row justify-content-center pb-2">
         <div class="card col-10">
-            <kanban-component />
+            <kanban-component :auth_user="{{Auth::user()}}" />
         </div>
     </div>
 </div>

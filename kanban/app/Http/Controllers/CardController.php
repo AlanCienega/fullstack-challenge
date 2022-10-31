@@ -42,9 +42,8 @@ class CardController extends Controller
      */
     public function store(StoreCardRequest $request)
     {
-        return 'hola store';
-        // Card::create($request->validated());
-        // return $request;
+        Card::create($request->validated());
+        return $request;
     }
 
     /**

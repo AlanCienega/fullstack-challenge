@@ -3,11 +3,19 @@
         <div class="row text-center">
             <div class="col-12 col-lg-4">
                 <div class="card mb-3">
-                    <div class="card-header">
+                    <div class="card-header d-flex justify-content-evenly">
                         Buffer
                         <b class="text-danger">
                             {{ getCardList(1).length }}
                         </b>
+                        <button
+                            class="btn btn-sm btn-outline-dark"
+                            type="button"
+                            data-bs-toggle="modal"
+                            data-bs-target="#formModal"
+                        >
+                            +
+                        </button>
                     </div>
                     <div
                         class="card-body drop-zone"
@@ -21,6 +29,8 @@
                             :key="index"
                             draggable="true"
                             @dragstart="startDrag($event, item)"
+                            data-bs-toggle="modal"
+                            data-bs-target="#formModal"
                         >
                             {{ item.name }}
                         </div>
@@ -29,7 +39,7 @@
             </div>
             <div class="col-12 col-lg-4">
                 <div class="card mb-3">
-                    <div class="card-header">
+                    <div class="card-header d-flex justify-content-evenly">
                         Working
                         <b class="text-warning">
                             {{ getCardList(2).length }}
@@ -47,6 +57,8 @@
                             :key="index"
                             draggable="true"
                             @dragstart="startDrag($event, item)"
+                            data-bs-toggle="modal"
+                            data-bs-target="#formModal"
                         >
                             {{ item.name }}
                         </div>
@@ -55,7 +67,7 @@
             </div>
             <div class="col-12 col-lg-4">
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header d-flex justify-content-evenly">
                         Done
                         <b class="text-success">{{ getCardList(3).length }}</b>
                     </div>
@@ -71,9 +83,56 @@
                             class="d-grid gap-2 btn btn-primary drag-el mb-2"
                             draggable="true"
                             @dragstart="startDrag($event, item)"
+                            data-bs-toggle="modal"
+                            data-bs-target="#formModal"
                         >
                             {{ item.name }}
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- modal -->
+        <div
+            class="modal fade"
+            id="formModal"
+            tabindex="-1"
+            aria-labelledby="modalForm"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="modalForm">
+                            Modal title
+                        </h1>
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                        ></button>
+                    </div>
+                    <div class="modal-body">
+                        <form @submit.prevent="saveCard(item)">
+                            <input
+                                type="text"
+                                placeholder="nombre de la tarea"
+                                class="form-control mb-2"
+                                v-model="item.name"
+                            />
+                            <input
+                                type="date"
+                                name="deadline"
+                                placeholder="fecha limite"
+                                class="form-control"
+                                v-model="item.deadline"
+                            />
+                            <div class="modal-footer">
+                                <button class="btn btn-primary">Guardar</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -87,8 +146,16 @@ import { ref } from "vue";
 import Swal from "sweetalert2";
 
 export default {
-    setup() {
+    props: ["auth_user"],
+    setup(props) {
+        const item = ref({
+            name: "",
+            status: 1,
+            deadline: "",
+            user_id: props.auth_user.id,
+        });
         const items = ref([]);
+        const is_show = ref(false);
         const loadData = async () => {
             const response = await axios.get("cards");
             items.value = response.data;
@@ -97,6 +164,10 @@ export default {
         loadData();
         const getCardList = (status) => {
             return items.value.filter((item) => item.status == status);
+        };
+
+        const showModal = () => {
+            is_show.value = true;
         };
 
         const startDrag = (event, item) => {
@@ -111,10 +182,25 @@ export default {
             if (status == 3) {
                 Swal.fire("¡Felicitaciones por lograrlo!", "", "success");
             }
-            axios.put(`cards/${item.id}`, item).then((response) => {});
+            axios.put(`cards/${item.id}`, item);
         };
-
-        return { getCardList, startDrag, onDrop };
+        const saveCard = (item) => {
+            axios.post("cards", item).then(() => {
+                item.name = "";
+                item.deadline = "";
+                is_show.value = false;
+                loadData();
+            });
+        };
+        return {
+            getCardList,
+            startDrag,
+            onDrop,
+            showModal,
+            is_show,
+            item,
+            saveCard,
+        };
     },
 };
 </script>
