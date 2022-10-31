@@ -116,12 +116,20 @@
                     </div>
                     <div class="modal-body">
                         <form @submit.prevent="saveCard(item)">
+                            <label for="name">Nombre de la tarea</label>
                             <input
                                 type="text"
-                                placeholder="nombre de la tarea"
                                 class="form-control mb-2"
                                 v-model="item.name"
                             />
+                            <div
+                                class="text-danger"
+                                v-for="(error, index) in errors.name"
+                                :key="index"
+                            >
+                                {{ error }}
+                            </div>
+                            <label for="deadline">Fecha limite</label>
                             <input
                                 type="date"
                                 name="deadline"
@@ -129,6 +137,13 @@
                                 class="form-control"
                                 v-model="item.deadline"
                             />
+                            <div
+                                class="text-danger"
+                                v-for="(error, index) in errors.deadline"
+                                :key="index"
+                            >
+                                {{ error }}
+                            </div>
                             <div class="modal-footer">
                                 <button class="btn btn-primary">Guardar</button>
                             </div>
@@ -154,6 +169,7 @@ export default {
             deadline: "",
             user_id: props.auth_user.id,
         });
+        const errors = ref([]);
         const items = ref([]);
         const is_show = ref(false);
         const loadData = async () => {
@@ -185,21 +201,28 @@ export default {
             axios.put(`cards/${item.id}`, item);
         };
         const saveCard = (item) => {
-            axios.post("cards", item).then(() => {
-                item.name = "";
-                item.deadline = "";
-                is_show.value = false;
-                loadData();
-            });
+            axios
+                .post("cards", item)
+                .then(() => {
+                    item.name = "";
+                    item.deadline = "";
+                    is_show.value = false;
+                    errors.value = [];
+                    loadData();
+                })
+                .catch((error) => {
+                    errors.value = error.response.data.errors;
+                });
         };
         return {
             getCardList,
             startDrag,
             onDrop,
             showModal,
+            saveCard,
             is_show,
             item,
-            saveCard,
+            errors,
         };
     },
 };
